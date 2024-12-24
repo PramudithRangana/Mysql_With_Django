@@ -1,0 +1,227 @@
+{% extends "weather_templates/index.html" %}
+{% load static %}
+
+{% block content %}
+    {% csrf_token %}
+    <h1>Regions</h1>
+    <div class="content">
+        <table class="tbl hoverable-table" id="editable-table">
+            <thead>
+                <tr>
+                    <th>
+                        <!-- "Select All" checkbox in the header -->
+                        <input type="checkbox" id="select-all-checkbox" onclick="selectAllRows(this)" />
+                    </th>
+                    <th class="ri-column">Region ID</th>
+                    <th class="name-column">Region Name</th>
+                    <th class="prov-column">Province</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rg in reg %}
+                <tr data-id="{{ rg.region_id }}">
+                    <td>
+                        <input type="checkbox" class="row-checkbox" />
+                    </td>
+
+                    <td class="ri-column">
+                        <input type="text" value="{{ rg.region_id }}" disabled />
+                    </td>
+                    <td class="name-column">
+                        <input type="text" value="{{ rg.region_name }}" />
+                    </td>
+                    <td class="prov-column">
+                        <input type="text" value="{{ rg.province }}" />
+                    </td>
+                </tr>
+                {% endfor %}
+                 <!-- New Row (Initially Hidden) -->
+                 <tr id="new-row" style="display: none;">
+                    <td>
+                        <input type="checkbox" class="row-checkbox" />
+                    </td>
+                    <td class="ri-column">
+                        <input type="text" id="new-region-id" placeholder="Region ID" disabled />
+                    </td>
+                    <td class="name-column">
+                        <input type="text" id="new-region-name" placeholder="Region Name" />
+                    </td>
+                    <td class="prov-column">
+                        <input type="text" id="new-province" placeholder="Province" />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Common Buttons -->
+    <div class="button-container">
+        <button onclick="showNewRow()">Show/Hide New Row</button>
+        <button onclick="saveAll()">Save All</button>
+        <button onclick="updateSelected()">Update Selected</button>
+        <button onclick="deleteSelected()">Delete Selected</button>
+    </div>
+
+    <!-- JavaScript for Save, Update, Delete -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Select all checkboxes in the table
+            const checkboxes = document.querySelectorAll("#editable-table .row-checkbox, #select-all-checkbox");
+            
+            // Uncheck each checkbox
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+        });
+
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        // Function to collect all rows and send them to the backend for Save
+        function saveAll() {
+            const rows = document.querySelectorAll("#editable-table tbody tr");
+            const data = [];
+
+            rows.forEach(row => {
+                const regionId = row.querySelector('.ri-column input').value;
+                const regionName = row.querySelector('.name-column input').value;
+                const province = row.querySelector('.prov-column input').value;
+
+                data.push({
+                    region_id: regionId,
+                    region_name: regionName,
+                    province: province
+                });
+            });
+
+            // Send data to the server
+            fetch("{% url 'save_all_regions' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken
+                },
+                body: JSON.stringify({ regions: data })
+            })
+            
+            .then(response => response.json())
+            .then(data => alert(data.message))
+            .catch(error => console.error("Error:", error));
+        }
+
+        // Function to update selected rows
+        function updateSelected() {
+            const rows = document.querySelectorAll("#editable-table tbody tr");
+            const selectedRows = [];
+        
+            rows.forEach(row => {
+                const isChecked = row.querySelector('.row-checkbox')?.checked; // Check if the row is selected
+                if (isChecked) {
+                    const regionId = row.querySelector('.ri-column input').value; // Get the region ID
+                    const regionName = row.querySelector('.name-column input').value; // Get updated region name
+                    const province = row.querySelector('.prov-column input').value; // Get updated province name
+        
+                    selectedRows.push({
+                        region_id: regionId,
+                        region_name: regionName,
+                        province: province
+                    });
+                }
+            });
+        
+            // Send updated rows to the backend
+            sendDataToServer(selectedRows, "{% url 'update_regions' %}", "Updated Successfully!");
+        }
+
+        // Function to delete selected rows
+        function deleteSelected() {
+            const rows = getSelectedRows();
+            sendDataToServer(rows, "{% url 'delete_regions' %}", "Deleted Successfully!");
+        }
+
+        // Helper function to get selected rows
+        function getSelectedRows() {
+            const rows = document.querySelectorAll("#editable-table tbody tr");
+            const selectedRows = [];
+
+            rows.forEach(row => {
+                const isChecked = row.querySelector('.row-checkbox')?.checked; // For selection
+                if (isChecked) {
+                    const regionId = row.querySelector('.ri-column input').value;
+                    selectedRows.push(regionId);
+                }
+            });
+            return selectedRows;
+        }
+
+        function selectAllRows(selectAllCheckbox) {
+            const checkboxes = document.querySelectorAll('.row-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAllCheckbox.checked;
+            });
+        }
+        
+        // Helper function to send data to the server
+        function sendDataToServer(data, url, successMessage) {
+            fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken
+                },
+                body: JSON.stringify({ data: data })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(successMessage); // Show success message
+                window.location.reload(); // Reload the page to refresh the data
+            })
+            .catch(error => console.error("Error:", error));
+        }
+
+        // Function to show/hide the new row and fetch the new alert ID
+        function showNewRow() {
+            const newRow = document.getElementById("new-row");
+
+            if (newRow.style.display === "none" || newRow.style.display === "") {
+                // Show the new row
+                newRow.style.display = "table-row";
+
+                // Clear previous inputs
+                document.getElementById("new-region-id").value = "";
+                document.getElementById("new-region-name").value = "";
+                document.getElementById("new-province").value = "";
+
+                // Add event listeners to generate ID dynamically
+                const regionNameInput = document.getElementById("new-region-name");
+                const provinceInput = document.getElementById("new-province");
+
+                regionNameInput.addEventListener("input", generateNewRegionId);
+                provinceInput.addEventListener("input", generateNewRegionId);
+            } else {
+                // Hide the new row
+                newRow.style.display = "none";
+            }
+        }
+
+        function generateNewRegionId() {
+            const regionName = document.getElementById("new-region-name").value.trim();
+            const province = document.getElementById("new-province").value.trim();
+
+            // Only generate ID if both fields are filled
+            if (regionName && province) {
+                fetch(`/weatherAnalyse/get_new_region_id?region_name=${regionName}&province=${province}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.new_region_id) {
+                            document.getElementById("new-region-id").value = data.new_region_id;
+                        } else {
+                            alert("Failed to generate new Region ID");
+                        }
+                    })
+                    .catch(error => console.error("Error fetching Region ID:", error));
+            }
+        }
+
+
+    </script>
+{% endblock content %}
