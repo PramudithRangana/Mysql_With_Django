@@ -1,0 +1,35 @@
+{% extends "weather_templates/index.html" %}
+{% load static %}
+
+{% block content %}
+    {% csrf_token %}
+    <h1>Seasonal Forecasts</h1>
+    <div class="content">
+        <table class="tbl hoverable-table">
+            <thead>
+                <tr>
+                    <td class="si-column" data-column="1">Season ID</td>
+                    <td class="name-column" data-column="2">Station Name</td>
+                    <td class="yr-column" data-column="3">Forecast Year</td>
+                    <td class="ss-column" data-column="4">Season</td>
+                    <td class="val-column" data-column="5">Forecast Value</td>
+                    <td class="type-column" data-column="6">Type ID</td>
+                    <td class="date-column" data-column="7">Forecast Date</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for seas_fo in seas_fore %}
+                <tr>
+                    <td class="si-column" data-column="1">{{ seas_fo.season_id }}</td>
+                    <td class="name-column" data-column="2">{{ seas_fo.station }}</td>
+                    <td class="yr-column" data-column="3">{{ seas_fo.forecast_year }}</td>
+                    <td class="ss-column" data-column="4">{{ seas_fo.season }}</td>
+                    <td class="val-column" data-column="5">{{ seas_fo.forecast_value }}</td>
+                    <td class="type-column" data-column="6">{{ seas_fo.forecast_type }}</td>
+                    <td class="date-column" data-column="7">{{ seas_fo.formatted_forecast_date }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock content %}

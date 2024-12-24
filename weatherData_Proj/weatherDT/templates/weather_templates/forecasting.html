@@ -1,0 +1,35 @@
+{% extends "weather_templates/index.html" %}
+{% load static %}
+
+{% block content %}
+    {% csrf_token %}
+    <h1>Forecasting</h1>
+    <div class="content">
+        <table class="tbl hoverable-table">
+            <thead>
+                <tr>
+                    <td class="fi-column" data-column="1">Forecast ID</td>
+                    <td class="name-column" data-column="2">Station Name</td>
+                    <td class="yr-column" data-column="3">Forecast Year</td>
+                    <td class="type-column" data-column="4">Type ID</td>
+                    <td class="fv-column" data-column="5">Forecast Value</td>
+                    <td class="dte-column" data-column="6">Forecast Date</td>
+                    <td class="acv-column" data-column="7">Actual Value</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for fore in forecasting %}
+                <tr>
+                    <td class="fi-column" data-column="1">{{ fore.forecast_id }}</td>
+                    <td class="name-column" data-column="2">{{ fore.station }}</td>
+                    <td class="yr-column" data-column="3">{{ fore.forecast_year}}</td>
+                    <td class="type-column" data-column="4">{{ fore.type}}</td>
+                    <td class="fv-column" data-column="5">{{ fore.forecast_value}}</td>
+                    <td class="dte-column" data-column="6">{{ fore.formatted_forecast_date}}</td>
+                    <td class="acv-column" data-column="7">{{ fore.actual_value}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock content %}

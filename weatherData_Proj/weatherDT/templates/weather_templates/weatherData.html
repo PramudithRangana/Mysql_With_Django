@@ -1,0 +1,37 @@
+{% extends "weather_templates/index.html" %}
+{% load static %}
+
+{% block content %}
+    {% csrf_token %}
+        <h1>Weather Data</h1>
+        <div class="content">
+            <table class="tbl hoverable-table">
+                <thead>
+                    <tr>
+                        <td class="dt-column" data-column="1">Data ID</td>
+                        <td class="name-column" data-column="2">Station Name</td>
+                        <td class="obs-column" data-column="3">Observation Date</td>
+                        <td class="temp-column" data-column="4">Temperature</td>
+                        <td class="rain-column" data-column="5">Rainfall</td>
+                        <td class="wind-column" data-column="6">Wind Speed</td>
+                        <td class="hum-column" data-column="7">Humidity</td>
+                        <td class="time-column" data-column="8">Observation Time</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for w_dt in weather_dt %}
+                    <tr>
+                        <td class="dt-column" data-column="1">{{ w_dt.weatherdata_id }}</td>
+                        <td class="name-column" data-column="2">{{ w_dt.station }}</td>
+                        <td class="obs-column" data-column="3">{{ w_dt.formatted_observation_date }}</td>
+                        <td class="temp-column" data-column="4">{{ w_dt.temperature }}</td>
+                        <td class="rain-column" data-column="5">{{ w_dt.rainfall }}</td>
+                        <td class="wind-column" data-column="6">{{ w_dt.wind_speed }}</td>
+                        <td class="hum-column" data-column="7">{{ w_dt.humidity }}</td>
+                        <td class="time-column" data-column="8">{{ w_dt.observation_time }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+{% endblock content %}

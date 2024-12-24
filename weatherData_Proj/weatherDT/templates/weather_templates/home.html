@@ -1,0 +1,18 @@
+{% extends "weather_templates/index.html" %}
+{% load static %}
+
+{% block content %}
+<h1>Weather Application Navigation</h1>
+<nav>
+    <ul>
+        <li><a href="{% url 'Weather-Station' %}">Weather Stations</a></li>
+        <li><a href="{% url 'Weather-Data' %}">Weather Data</a></li>
+        <li><a href="{% url 'Weather-Alert' %}">Weather Alerts</a></li>
+        <li><a href="{% url 'Seasonal-Forecast' %}">Seasonal Forecasts</a></li>
+        <li><a href="{% url 'Region' %}">Regions</a></li>
+        <li><a href="{% url 'Forecast' %}">Forecasts</a></li>
+        <li><a href="{% url 'Forecast-Type' %}">Forecast Types</a></li>
+        <li><a href="{% url 'Forecast-Accuracy' %}">Forecast Accuracy</a></li>
+    </ul>
+</nav>
+{% endblock %}

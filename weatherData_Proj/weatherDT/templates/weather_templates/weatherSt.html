@@ -1,0 +1,34 @@
+{% extends "weather_templates/index.html" %}
+{% load static %}
+
+{% block content %}
+    {% csrf_token %}
+    <h1>Weather Stations</h1>
+    <div class="content">
+        <table class="tbl hoverable-table">
+            <thead>
+                <tr>
+                    <td class="st-column" data-column="1">Station ID</td>
+                    <td class="name-column" data-column="2">Station Name</td>
+                    <td class="loc-column" data-column="3">Station Location</td>
+                    <td class="lat-column" data-column="4">Latitude</td>
+                    <td class="long-column" data-column="5">Longitude</td>
+                    <td class="reg-column" data-column="6">Region ID</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for weatherSt in weather_st %}
+                <tr>
+                    <td class="st-column" data-column="1">{{ weatherSt.station_id }}</td>
+                    <td class="name-column" data-column="2">{{ weatherSt.station_name }}</td>
+                    <td class="loc-column" data-column="3">{{ weatherSt.st_location}}</td>
+                    <td class="lat-column" data-column="4">{{ weatherSt.latitude}}</td>
+                    <td class="long-column" data-column="5">{{ weatherSt.longitude}}</td>
+                    <td class="reg-column" data-column="6">{{ weatherSt.region}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock content %}
+

@@ -1,0 +1,110 @@
+{% extends "weather_templates/index.html" %}
+{% load static %}
+
+{% block scripts %}
+    <script src="{% static '/AccuracyChart.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    {% csrf_token %}
+    <h1>Forecast Accuracy Graph</h1>
+    <canvas id="accuracyChart" width="1200" height="600"></canvas>
+
+    <script>
+        const ctx = document.getElementById('accuracyChart').getContext('2d');
+
+        const labels = {{ timestamps|safe }};
+        const errorMargins = {{ error_margins|safe }};
+        const accuracyPercentages = {{ accuracy_percentages|safe }};
+
+        const data = {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Error Margin (%)',
+                    data: errorMargins,
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    tension: 0.4
+                },
+                {
+                    label: 'Accuracy Percentage (%)',
+                    data: accuracyPercentages,
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    tension: 0.4
+                }
+            ]
+        };
+
+        // Custom Crosshair Plugin
+        const crosshairPlugin = {
+            id: 'crosshairPlugin',
+            afterDraw: (chart) => {
+                const ctx = chart.ctx;
+                const tooltip = chart.tooltip;
+
+                if (tooltip._active && tooltip._active.length) {
+                    const { x, y } = tooltip._active[0].element; // Get current point's position
+
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.lineWidth = 1;
+                    ctx.strokeStyle = 'rgba(0, 200, 0, 0.5)'; // Crosshair line color
+
+                    // Draw vertical line (X axis)
+                    ctx.moveTo(x, chart.chartArea.top);
+                    ctx.lineTo(x, chart.chartArea.bottom);
+
+                    // Draw horizontal line (Y axis)
+                    ctx.moveTo(chart.chartArea.left, y);
+                    ctx.lineTo(chart.chartArea.right, y);
+
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            }
+        };
+
+        const config = {
+            type: 'line',
+            data: data,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    },
+                    tooltip: {
+                        enabled: true,
+                        mode: 'index', // Activate nearest point hover
+                        intersect: false // Allow hover between points
+                    }
+                },
+                interaction: {
+                    mode: 'nearest', // Make crosshair follow mouse position
+                    intersect: false
+                },
+                scales: {
+                    x: {
+                        type: 'category',
+                        title: {
+                            display: true,
+                            text: 'Date'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Values (%)'
+                        }
+                    }
+                }
+            },
+            plugins: [crosshairPlugin] // Register the custom plugin
+        };
+
+        const accuracyChart = new Chart(ctx, config);
+    </script>
+
+{% endblock content %}

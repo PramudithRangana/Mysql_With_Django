@@ -1,0 +1,33 @@
+{% extends "weather_templates/index.html" %}
+{% load static %}
+
+{% block content %}
+    {% csrf_token %}
+    <h1>Weather Alert</h1>
+    <div class="content">
+        <table class="tbl hoverable-table">
+            <thead>
+                <tr>
+                    <td class="alt-column" data-column="1">Alert ID</td>
+                    <td class="name-column" data-column="2">Station Name</td>
+                    <td class="type-column" data-column="3">Alert Type</td>
+                    <td class="desc-column" data-column="4">Alert Description</td>
+                    <td class="issue-column" data-column="5">Issue Date</td>
+                    <td class="sev-column" data-column="6">Severity</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for w_alt in weather_alt %}
+                <tr>
+                    <td class="alt-column" data-column="1">{{ w_alt.station_id }}</td>
+                    <td class="name-column" data-column="2">{{ w_alt.station }}</td>
+                    <td class="type-column" data-column="3">{{ w_alt.alert_type}}</td>
+                    <td class="desc-column" data-column="4">{{ w_alt.alert_description}}</td>
+                    <td class="issue-column" data-column="5">{{ w_alt.formatted_issued_date }}</td>
+                    <td class="sev-column" data-column="6">{{ w_alt.severity}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock content %}

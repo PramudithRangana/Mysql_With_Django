@@ -1,0 +1,36 @@
+{% extends "weather_templates/index.html" %}
+{% load static %}
+
+{% block content %}
+    {% csrf_token %}
+    <h1>Forecast Accuracy</h1>
+    <div class="content">
+        <table class="tbl hoverable-table">
+            <thead>
+                <tr>
+                    <td class="ac-column" data-column="1">Accuracy ID</td>
+                    <td class="fc-column" data-column="2">Forecast</td>
+                    <td class="err-column" data-column="3">Error Margin</td>
+                    <td class="perc-column" data-column="4">Accuracy Percentage</td>
+                    <td class="dtime-column" data-column="5">Date & Time</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for f_acc in fore_acc %}
+                <tr>
+                    <td class="ac-column" data-column="1">{{ f_acc.accuracy_id }}</td>
+                    <td class="fc-column" data-column="2">{{ f_acc.forecast }}</td>
+                    <td class="err-column" data-column="3">{{ f_acc.error_margin }}</td>
+                    <td class="perc-column" data-column="4">{{ f_acc.accuracy_percentage }}</td>
+                    <td class="dtime-column" data-column="5">{{ f_acc.formatted_date_time }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Button to Open the Graph Page -->
+    <div class="graph-button">
+        <a href="{% url 'accuracy_graph' %}" class="btn btn-primary" target="_blank">View Graph</a>
+    </div>
+{% endblock content %}

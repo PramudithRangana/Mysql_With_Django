@@ -1,0 +1,27 @@
+{% extends "weather_templates/index.html" %}
+{% load static %}
+
+{% block content %}
+    {% csrf_token %}
+    <h1>Weather Type</h1>
+    <div class="content">
+        <table class="tbl hoverable-table">
+            <thead>
+                <tr>
+                    <td class="fi-column" data-column="1">Forecast ID</td>
+                    <td class="name-column" data-column="2">Type Name</td>
+                    <td class="desc-column" data-column="3">Description</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ft in fore_type %}
+                <tr>
+                    <td class="fi-column" data-column="1">{{ ft.type_id }}</td>
+                    <td class="name-column" data-column="2">{{ ft.type_name }}</td>
+                    <td class="desc-column" data-column="3">{{ ft.type_description}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock content %}
