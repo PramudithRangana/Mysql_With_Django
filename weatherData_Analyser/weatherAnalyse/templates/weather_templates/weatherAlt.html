@@ -1,0 +1,290 @@
+{% extends "weather_templates/index.html" %}
+{% load static %}
+
+{% block content %}
+    {% csrf_token %}
+    <h1>Weather Alert</h1>
+    <div class="content">
+        <table class="tbl hoverable-table" id="weather-alert-table">
+            <thead>
+                <tr>
+                    <th>
+                        <input type="checkbox" id="select-all-checkbox" onclick="selectAllRows(this)" />
+                    </th>
+                    <th>Alert ID</th>
+                    <th>Station Name</th>
+                    <th>Alert Type</th>
+                    <th>Alert Description</th>
+                    <th>Issue Date</th>
+                    <th>Severity</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for w_alt in weather_alt %}
+                <tr data-alert-id="{{ w_alt.alert_id }}">
+                    <td>
+                        <input type="checkbox" class="row-checkbox" />
+                    </td>
+                    <td>
+                        <input type="text" value="{{ w_alt.alert_id }}" disabled />
+                    </td>
+                    <td>
+                        <select class="station-dropdown">
+                            <option value="">Select Station</option>
+                            {% for station in weather_stations %}
+                                <option value="{{ station.station_id }}"
+                                    {% if station.station_id == w_alt.station.station_id %}selected{% endif %}>
+                                    {{ station.station_name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        <input type="text" value="{{ w_alt.alert_type }}" />
+                    </td>
+                    <td>
+                        <textarea style="width: 400px; height: 40px;">{{ w_alt.alert_description }}</textarea>
+                    </td>
+                    <td>
+                        <input type="date" value="{{ w_alt.issued_date|date:'Y-m-d' }}" />
+                    </td>
+                    <td>
+                        <select class="severity-dropdown">
+                            <option value="Low" {% if w_alt.severity == 'Low' %}selected{% endif %}>Low</option>
+                            <option value="Moderate" {% if w_alt.severity == 'Moderate' %}selected{% endif %}>Moderate</option>
+                            <option value="High" {% if w_alt.severity == 'High' %}selected{% endif %}>High</option>
+                            <option value="Severe" {% if w_alt.severity == 'Severe' %}selected{% endif %}>Severe</option>
+                        </select>
+                        
+                    </td>
+                </tr>
+                {% endfor %}
+                
+                <!-- Container for the new row -->
+                <tr id="new-row" style="display: none;">
+                    <td>
+                        <input type="checkbox" class="row-checkbox" />
+                    </td>
+                    <td>
+                        <input type="text" id="new-alert-id" placeholder="Enter Alert ID" />
+                    </td>
+                    <td>
+                        <select id="new-station-id">
+                            <option value="">Select Station</option>
+                            {% for station in weather_stations %}
+                                <option value="{{ station.station_id }}">{{ station.station_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        <input type="text" id="new-alert-type" placeholder="Enter Alert Type" />
+                    </td>
+                    <td>
+                        <textarea id="new-alert-description" placeholder="Enter Alert Description"></textarea>
+                    </td>
+                    <td>
+                        <input type="date" id="new-issued-date" />
+                    </td>
+                    <td>
+                        <select id="new-severity">
+                            <option value="Low">Low</option>
+                            <option value="Moderate">Moderate</option>
+                            <option value="High">High</option>
+                            <option value="Severe">Severe</option>
+                        </select>
+                    </td>
+                </tr>
+
+                <!-- New Row for Adding Alerts -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- New Row for Adding Alerts -->
+    <div class="button-container">
+        <button onclick="showNewRow()">New</button>
+        <button onclick="saveSelected()">Save</button>
+        <button onclick="updateSelected()">Update Selected</button>
+        <button onclick="deleteSelected()">Delete Selected</button>
+    </div>
+
+
+    <script>
+        function showNewRow() {
+            const newRow = document.getElementById("new-row");
+
+            if (newRow.style.display === "none" || newRow.style.display === "") {
+                // Show the new row
+                newRow.style.display = "table-row";
+        
+                // Make AJAX call to fetch new alert_id
+                fetch('/weatherAnalyse/get_new_alert_id') // This endpoint will execute the procedure
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.new_alert_id) {
+                            document.getElementById("new-alert-id").value = data.new_alert_id;
+                        } else {
+                            alert("Failed to generate new Alert ID");
+                        }
+                    })
+                    .catch(error => console.error("Error fetching Alert ID:", error));
+            } else {
+                // Hide the new row
+                newRow.style.display = "none";
+            }
+
+        }
+
+        function saveSelected() {
+            // Get the new row with the inputs
+            const rowSelector = document.querySelector("#new-row");
+        
+            if (!rowSelector) {
+                console.error("Element #new-row not found in the DOM.");
+                alert("An error occurred: The new row is missing.");
+                return;
+            }
+        
+            // Extract the input values from the new row
+            const alertIdInput = rowSelector.querySelector('#new-alert-id').value.trim();
+            const stationId = rowSelector.querySelector('#new-station-id').value.trim();
+            const alertType = rowSelector.querySelector('#new-alert-type').value.trim();
+            const alertDescription = rowSelector.querySelector('#new-alert-description').value.trim();
+            const issuedDate = rowSelector.querySelector('#new-issued-date').value.trim();
+            const severity = rowSelector.querySelector('#new-severity').value.trim();
+        
+            // Check if all necessary values are provided
+            if (!alertIdInput || !stationId || !alertType || !alertDescription || !issuedDate || !severity) {
+                alert("Please fill in all fields before saving.");
+                return;
+            }
+        
+            // Prepare the alert data
+            const alertData = {
+                alert_id: alertIdInput,
+                station_id: stationId,
+                alert_type: alertType,
+                alert_description: alertDescription,
+                issued_date: issuedDate,
+                severity: severity,
+            };
+        
+            console.log("Prepared alert data:", alertData);
+        
+            // Send the alert data to the server
+            fetch("/weatherAnalyse/add_weather_alert/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCSRFToken(), // Add your CSRF token retrieval function
+                },
+                body: JSON.stringify([alertData]),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Response:", data);
+                    alert(data.message); // Show confirmation message
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    alert("An error occurred while saving the alert. Please try again.");
+                });
+        }
+        
+        
+        function deleteSelected() {
+            const rows = document.querySelectorAll("#weather-alert-table tbody tr");
+            const selectedAlertIds = [];
+        
+            rows.forEach(row => {
+                if (row.querySelector(".row-checkbox").checked) {
+                    const alertId = row.querySelector('input[type="text"]').value;
+                    selectedAlertIds.push(alertId);
+                }
+            });
+        
+            if (selectedAlertIds.length === 0) {
+                alert("No alerts selected for deletion.");
+                return;
+            }
+        
+            // Sending the selected alert_ids to the server for deletion
+            fetch("/weatherAnalyse/delete_weather_alerts/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCSRFToken(),  // Add CSRF token for safety
+                },
+                body: JSON.stringify(selectedAlertIds),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Response:", data);
+                    alert(data.message); // Show confirmation message
+                    if (data.message.includes("deleted")) {
+                        // Remove deleted rows from the table
+                        rows.forEach(row => {
+                            if (row.querySelector(".row-checkbox").checked) {
+                                row.remove();
+                            }
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    alert("An error occurred while deleting the alerts. Please try again.");
+                });
+        }
+        
+
+        function updateSelected() {
+            const selectedRows = document.querySelectorAll('tr[data-alert-id] input.row-checkbox:checked');
+            
+            if (selectedRows.length === 0) {
+                alert("No rows selected for updating.");
+                return;
+            }
+        
+            const updates = [];
+            selectedRows.forEach((checkbox) => {
+                const row = checkbox.closest('tr');
+                const alertId = row.dataset.alertId;
+        
+                const stationId = row.querySelector('.station-dropdown')?.value || null;
+                const alertType = row.querySelector('input[type="text"]:not([disabled])')?.value || null;
+                const alertDescription = row.querySelector('textarea')?.value || null;
+                const issuedDate = row.querySelector('input[type="date"]')?.value || null;
+                const severity = row.querySelector('.severity-dropdown')?.value || null;
+
+                updates.push({
+                    alert_id: alertId,
+                    station_id: stationId,
+                    alert_type: alertType,
+                    alert_description: alertDescription,
+                    issued_date: issuedDate,
+                    severity: severity,
+                });
+
+                alert("Changes Updated Successfully !");
+            });
+
+            fetch("/weatherAnalyse/update_weather_alerts/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCSRFToken(),
+                },
+                body: JSON.stringify(updates),
+            })
+                .then(response => response.json())
+                .then(data => console.log("Response:", data))
+                .catch(error => console.error("Error:", error));
+
+        }
+        function getCSRFToken() {
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            return csrfToken;
+        }
+
+    </script>
+{% endblock content %}

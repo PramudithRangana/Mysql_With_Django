@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate" />
+        <meta http-equiv="pragma" content="no-cache" />
+        <meta http-equiv="expires" content="0" />
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" type="text/css" href="{% static '/ctrl-flow.css' %}">
+        <link rel="icon" href="#" type="image/x-icon">
+        <script src="{% static '/table-hover.js' %}" defer></script>
+
+        {% if title %}
+            <title>Weather Home - {{ title }}</title>
+        {% else %}
+            <title>Weather Home</title>
+        {% endif %}
+
+        {% block scripts %}{% endblock %}
+    </head>
+    <body>
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+
+    </body>
+
+</html>

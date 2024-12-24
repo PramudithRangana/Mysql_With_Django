@@ -1,0 +1,209 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #282C34;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    width: 100%;  /* Make sure body spans the entire screen */
+    margin: 0;    /* Remove any default margin */
+}
+
+h1 {
+    color: rgb(174, 174, 174);
+    text-align: center;
+    font-size: 2.5em;
+    margin-bottom: 20px;
+}
+
+.content {
+    position: relative;
+    padding: 20px;
+    border-radius: 10px;
+    width: 100%;  /* Ensure it's taking the full width */
+    background: rgba(131, 95, 4, 0.788);
+    line-height: 20pt;
+    margin: 30px auto;  /* Margin to center the container */
+    box-sizing: border-box;  /* Ensure padding is considered in width */
+}
+
+
+.content .tbl {
+    position: relative;
+    font-size: 13.5pt;
+    margin: 5px auto;
+    width: 100%; /* Ensure the table takes the full width of the container */
+    padding: 10px;
+    background: #41547ea8;
+    border-radius: 20px;
+    line-height: 1.8em;
+    letter-spacing: 0.08em;
+}
+
+.content .tbl thead {
+    font-weight: 600;
+    font-size: 15pt;
+}
+
+.content .tbl tr {
+    background: #282C34;
+    padding: 12px;
+    justify-content: center;
+}
+
+.content .tbl .st-column, .alt-column, .si-column, .ri-column, .fi-column, .ac-column, .dt-column {
+    color: rgb(80, 80, 247);
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    letter-spacing: 0.09em;
+}
+
+.content .tbl .name-column, .fc-column {
+    color: rgb(203, 247, 80);
+    position: relative;
+    text-align: center;
+}
+
+.content .tbl .loc-column, .type-column, .yr-column, .prov-column, .desc-column, .err-column, .obs-column {
+    color: rgb(80, 247, 94);
+    position: relative;
+    text-align: center;
+}
+
+.content .tbl .lat-column, .ss-column, .type-column, .perc-column, .temp-column {
+    color: rgb(209, 90, 90);
+    position: relative;
+    text-align: right;
+}
+.content .tbl .long-column, .issue-column, .val-column, .fv-column, .dtime-column, .rain-column {
+    color: rgb(251, 100, 0);
+    position: relative;
+    text-align: right;
+}
+.content .tbl .reg-column, .sev-column, .type-column, .dte-column, .wind-column {
+    color: rgb(229, 196, 84);
+    position: relative;
+    text-align: right;
+}
+
+.content .tbl .date-column, .acv-column, .hum-column{
+    color: rgb(200, 106, 184);
+    position: relative;
+    text-align: right;
+}
+
+.content .tbl .time-column{
+    color: rgb(107, 198, 114);
+    position: relative;
+    text-align: right;
+}
+
+.content .tbl td{
+    padding: 15px 20px;
+}
+
+.content .tbl tbody tr:hover{
+    background-color: rgb(55, 59, 66);
+    /* font-weight: 600; */
+}
+
+.content .tbl thead td:hover{
+    background-color: rgb(55, 59, 66);
+}
+
+/* Style for highlighting the hovered column */
+.hover-column {
+    background-color: rgb(55, 59, 66) !important;
+}
+
+.graph-button a {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+
+.graph-button a:hover {
+    background-color: #0056b3;
+}
+
+
+
+/* Navigation Menu */
+nav {
+    background-color: #333;
+    padding: 10px;
+    border-radius: 8px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+nav ul li {
+    display: inline-block;
+    margin-right: 20px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-size: 1.2em;
+    padding: 10px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+nav ul li a:hover {
+    background-color: #4CAF50;
+    color: #fff;
+    border-radius: 5px;
+}
+
+/* Active link style */
+nav ul li a:active {
+    background-color: #45a049;
+}
+
+/* Responsive Design for Smaller Screens */
+@media (max-width: 768px) {
+    nav {
+        padding: 15px;
+    }
+
+    nav ul {
+        padding: 0;
+        text-align: center;
+    }
+
+    nav ul li {
+        display: block;
+        margin-bottom: 10px;
+        margin-right: 0; /* Removes right margin on mobile */
+    }
+
+    nav ul li a {
+        font-size: 1.5em; /* Increase font size for better readability */
+        padding: 15px; /* Add some padding for easy clicking */
+    }
+}
+
+#new-row-container {
+    margin-top: 10px;
+}
+
+
